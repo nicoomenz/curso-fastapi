@@ -6,12 +6,12 @@ from sqlmodel import Session, create_engine, SQLModel
 sqlite_name = "db.sqlite3"
 sqlite_url = f"sqlite:///{sqlite_name}"
 
-engine = create_engine(sqlite_url)
+engine = create_engine(sqlite_url) #crea la base de datos en sqlite
 
 def create_all_tables(app: FastAPI):
     SQLModel.metadata.create_all(engine) #crea todas las tablas en la base de datos
     yield #cedemos el control a la aplicacion a fastapi
-    
+
 def get_session():
     with Session(engine) as session:
         yield session
