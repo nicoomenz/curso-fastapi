@@ -1,6 +1,7 @@
-from sqlmodel import select
+from sqlmodel import func, select
 from models import *
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
+from typing import Any
 from db import SessionDep
 
 router = APIRouter(tags=['transactions'])
@@ -20,9 +21,22 @@ async def create_transaction(transaction_data: TransactionCreate, session: Sessi
     return transaction_db
 
 
+#skip es los numeros de registros a omitir y limit es el numero de registros a mostrar en el paginador
+@router.get("/transactions/", response_model=dict[str, Any])
+async def get_transactions(session: SessionDep, 
+    skip: int = Query(0, description="Registros a omitir"), 
+    limit: int=Query(5, description="Numero de registros")):
 
-@router.get("/transactions/", response_model=list[Transaction])
-async def get_transactions(session: SessionDep):
-    query = select(Transaction)
+    total = session.exec(select(func.count()).select_from(Transaction)).one()
+    totalpagination: int = (total + limit - 1) // limit #calculamos el total de paginas
+    query = select(Transaction).offset(skip).limit(limit) #obtenemos los registros de la base de datos
     transactions = session.exec(query).all()
-    return transactions
+    
+    response = {
+        "total": totalpagination,
+        "skip": skip,
+        "limit": limit,
+        "transactions": transactions
+    }
+
+    return response
