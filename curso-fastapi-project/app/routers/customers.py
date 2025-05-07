@@ -8,7 +8,7 @@ db_customers: list[Customer] = [] #base de datos en memoria
 
 router = APIRouter(tags=['customers']) #creamos un router para agrupar los endpoints de clientes
 
-@router.post("/customers/", response_model=Customer) #con que modelo vamos a responder
+@router.post("/customers/", response_model=Customer, status_code=status.HTTP_201_CREATED) #con que modelo vamos a responder
 async def create_customer(customer_data: CustomerCreate, session: SessionDep): #con que modelo vamos a recibir
     customer = Customer.model_validate(customer_data.model_dump())
     session.add(customer) #agregamos el cliente a la base de datos

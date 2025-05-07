@@ -12,7 +12,7 @@ def create_all_tables(app: FastAPI):
     SQLModel.metadata.create_all(engine) #crea todas las tablas en la base de datos
     yield #cedemos el control a la aplicacion a fastapi
 
-def get_session():
+def get_session(): # en fastapi una dependencia es una funcion que retorna un valor
     with Session(engine) as session:
         yield session
 
